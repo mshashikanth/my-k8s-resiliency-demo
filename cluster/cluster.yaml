@@ -1,0 +1,34 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: resiliency-demo-cluster
+  region: us-west-2 # Or your preferred region
+  version: "1.29" # Or a recent stable Kubernetes version (e.g., "1.29", "1.30")
+
+vpc:
+  # Temporarily remove the 'nat: gateway: Disable' for easier setup
+  # For a simple prototype, letting eksctl create the default NAT Gateway is often easier,
+  # as your nodes will need internet access to pull Docker images.
+  # If you are absolutely sure about disabling it and have a specific networking plan (e.g., VPC endpoints),
+  # then you'd keep it. For this quick project, the default is simpler.
+  # I'm commenting it out here for you, as it might be causing subtle issues or is not needed
+  # given the dev build behavior.
+
+managedNodeGroups: # Ensure this is 'managedNodeGroups'
+  - name: demo-nodegroup
+    instanceType: t3.medium # Smallest general purpose instance
+    minSize: 1 # <-- CHANGE THIS FROM minCapacity to minSize
+    maxSize: 2 # <-- CHANGE THIS FROM maxCapacity to maxSize
+    desiredCapacity: 1 # This field is correct and common
+    volumeSize: 20 # Small volume for worker nodes
+    spot: true # CRUCIAL for cost saving!
+    labels: { role: worker }
+    tags:
+      Owner: YourName
+      Project: K8sResiliencyDemo
+
+# IMPORTANT: Re-add the IAM OIDC configuration. It's critical for Service Accounts
+# to interact with AWS services, which is needed for many K8s addons (like ALB Ingress Controller)
+# and general best practices. It should be at the top level, aligned with metadata, vpc, etc.
+iam:
+  withOIDC: true

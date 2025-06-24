@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-app
+  namespace: demo-app
+  labels:
+    app: backend-app
+spec:
+  replicas: 1 # Start with 1, HPA will scale it
+  selector:
+    matchLabels:
+      app: backend-app
+  template:
+    metadata:
+      labels:
+        app: backend-app
+    spec:
+      containers:
+      - name: backend-app
+        image: sasik2763/backend-app:latest # REPLACE WITH YOUR DOCKER HUB USERNAME
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+        livenessProbe: # Essential for self-healing: checks if the app is still running/responsive
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5 # Give the app a moment to start
+          periodSeconds: 10    # Check every 10 seconds
+          failureThreshold: 3  # After 3 failures, restart the container
+        readinessProbe: # Essential for service readiness: checks if the app is ready to serve traffic
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3

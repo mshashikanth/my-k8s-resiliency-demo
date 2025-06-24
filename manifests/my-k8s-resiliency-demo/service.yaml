@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: demo-app
+  annotations:
+    # Use AWS Load Balancer Controller if installed, otherwise NodePort/LoadBalancer
+    # For quick prototype, LoadBalancer type is simplest
+    # This annotation is for the AWS Load Balancer Controller, which is superior.
+    # However, for the very first pass, LoadBalancer type will create a classic ELB/NLB directly.
+    # service.beta.kubernetes.io/aws-load-balancer-type: external # Commenting out for now
+spec:
+  selector:
+    app: frontend-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer # This will provision an AWS Load Balancer (ELB/NLB)

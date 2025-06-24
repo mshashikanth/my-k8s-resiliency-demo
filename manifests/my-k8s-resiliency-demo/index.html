@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Service</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; background-color: #f0f0f0; }
+        h1 { color: #333; }
+        p { color: #666; }
+        #backend-response {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Frontend Service (Nginx)</h1>
+    <p>This is the static frontend serving from Nginx.</p>
+    <p>Fetching response from Backend Service...</p>
+    <div id="backend-response">Loading...</div>
+
+    <script>
+        async function fetchBackend() {
+            try {
+                // This assumes the backend service is named 'backend-service'
+                // and is in the same Kubernetes namespace (demo-app).
+                // Kubernetes DNS will resolve 'backend-service' to its ClusterIP.
+                const response = await fetch('http://backend-service');
+                const text = await response.text();
+                document.getElementById('backend-response').innerText = text;
+            } catch (error) {
+                document.getElementById('backend-response').innerText = `Error connecting to backend: ${error.message}`;
+                console.error('Error fetching backend:', error);
+            }
+        }
+        fetchBackend();
+        // Refresh every 5 seconds to see different backend pods as they scale/heal
+        setInterval(fetchBackend, 5000);
+    </script>
+</body>
+</html>
