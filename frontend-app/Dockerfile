@@ -1,11 +1,6 @@
 # Use the official Nginx base image
 FROM nginx:latest
 
-# --- DEBUGGING STEP: Show content of local index.html before copy ---
-# This assumes the Docker build context is the frontend-app directory.
-RUN ls -l ./index.html
-RUN cat ./index.html
-
 # Copy the custom index.html file
 COPY index.html /usr/share/nginx/html/index.html
 

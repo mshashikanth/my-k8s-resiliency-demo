@@ -8,6 +8,6 @@ spec:
     app: backend-app
   ports:
     - protocol: TCP
-      port: 80 # Service port (how other services access it)
+      port: 5000 # Service port (how other services access it)
       targetPort: 5000 # Container port (what the app listens on)
   type: ClusterIP # Internal service, only accessible within the cluster
